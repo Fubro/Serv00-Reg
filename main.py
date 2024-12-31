@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import json
 import time
 import string
@@ -162,23 +163,15 @@ def start_task(input_email: str):
         if input_email in cache:
             del cache[input_email]
 if __name__ == "__main__":
-    First_Run = True
-    while True:
-        try:
-            with open(config_file, 'r') as f:
-                config = json.load(f)
-                input_token, input_chatid = config['token'], config['chatid']
-                break
-        except (FileNotFoundError, json.JSONDecodeError):
-            if First_Run: logger.error("\033[1;92m初始化运行未检测到配置文件.\033[0m"); First_Run = False
-            input_token, input_chatid = start_userconfig()
-os.system("cls" if os.name == "nt" else "clear")
-response = requests.get('https://ping0.cc/geo', verify=False)
-print(f"=============================\n\033[96m{response.text[:200]}\033[0m=============================")
-logger.info("\033[91m输入邮箱开始自动任务,退出快捷键Ctrl+C.\033[0m")
-while True:
-    input_email = get_valid_input("\033[1;94m请输入邮箱:\033[0m", lambda x: '@' in x, "无效的邮箱,请重新输入.")
+    response = requests.get('https://ping0.cc/geo', verify=False)
+    print(f"=============================\n\033[96m{response.text[:200]}\033[0m=============================")
+    if len(sys.argv) < 2:
+        print("请提供一个邮箱作为参数，例如: python main.py your_email@example.com")
+        sys.exit(1)
+    
+    input_email = sys.argv[1]
     if '@' not in input_email:
-        logger.error("\033[1;93m无效的邮箱,请重新输入.\033[0m")
-        continue
+        print("无效的邮箱，请检查输入后重试。")
+        sys.exit(1)
+
     start_task(input_email)
